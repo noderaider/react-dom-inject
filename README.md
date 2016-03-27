@@ -54,6 +54,8 @@ export const MyReactElement = props => {
 export const MyReactElementDOM = ReactDOMInject(MyReactElement)
 ```
 
+
+
 #### render.js
 
 ```js

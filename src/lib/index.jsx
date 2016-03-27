@@ -1,8 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-
-
 /**
  * ReactDOMInject
  * Thunk that binds a ReactElement to properties of DOM elements based on selector and returns functions to render to first matching element or all matching elements.
