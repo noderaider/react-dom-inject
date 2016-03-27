@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "Binds an HTML element by selector to a ReactElement and renders to a DOM tree (with optional redux injection).",
   "main": "lib/index.js",
-  "files": [ "lib" ],
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "babel src/lib -d lib",
@@ -33,6 +35,7 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-preset-es2015": "^6.6.0",
-    "babel-preset-react": "^6.5.0"
+    "babel-preset-react": "^6.5.0",
+    "rimraf": "^2.5.2"
   }
 }
