@@ -1,5 +1,5 @@
 import React from 'react'
-import { connect as connectRedux } from 'react-redux'
+import { connect as connectRedux, Provider } from 'react-redux'
 import ReactDOMInject from './ReactDOMInject'
 
 /**
