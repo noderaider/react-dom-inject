@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 
 /**
  * ReactDOMInject
@@ -8,43 +9,36 @@ import ReactDOM from 'react-dom'
  * @param  {ReactElement} ReactElement  The ReactElement to bind properties found in HTML DOM selected elements to.
  * @return {Thunk}                      Returns an object with render and renderAll functions for binding the react element with elements found in the DOM.
  */
-const ReactDOMInject = ReactElement => {
+const ReactDOMInject = (ReactElement, store) => {
   const _render = (element, props = {}) => {
     let dataset = element.dataset || datasetShim(element)
     if(dataset)
       Object.assign(props, dataset)
     let __html = element.innerHTML.length > 0 ? element.innerHTML : null
-    return ReactDOM.render(__html ? <ReactElement {...props} dangerouslySetInnerHTML={{ __html }} /> : <ReactElement {...props} />, element)
-  }
-  const _tryRender = (selector, props) => {
-    let element = document.querySelector(selector)
-    return element || false
-    if(element)
-      return _render(element, props)
+    //const Element = () => __html ? <ReactElement {...props} dangerouslySetInnerHTML={{ __html }} /> : <ReactElement {...props} />
+    return ReactDOM.render(<ReactElement {...props} store={store} />, element)
   }
   /** Renders the ReactElement onto the selected element and allows optional default props to be provided. */
   const render = (selector, props = {}) => {
-    let rendered = _tryRender(selector, props)
     let attempts = 0
     let maxAttempts = 20
-    if(rendered)
-      return Promise.resolve(rendered)
-    else {
+    let element = document.querySelector(selector)
+    if(element) {
+      return Promise.resolve(_render(element, props))
+    } else {
       return new Promise((resolve, reject) => {
         attempts++
         let interval = setInterval(() => {
-          let rendered = _tryRender(selector, props)
-          if(rendered) {
+          let element = document.querySelector(selector)
+          if(element) {
             clearInterval(interval)
             console.warn(`ReactDOMInject: Rendered in ${attempts} attempts => '${selector}'`)
-            Promise.resolve(rendered)
+            resolve(_render(element, props))
           } else if(attempts == maxAttempts) {
             clearInterval(interval)
-            const message = `ReactDOMInject: Failed to find query selector in ${attempts} attempts => '${selector}'`
-            console.warn(message)
-            Promise.reject(new Error(message))
+            reject(new Error(`ReactDOMInject: Failed to find query selector in ${attempts} attempts => '${selector}'`))
           }
-        }, 100)
+        }, 20)
       })
     }
   }
@@ -64,8 +58,7 @@ const datasetShim = element => {
   if(!element.hasAttributes())
     return
   let dataset = {}
-  let attrs = Array.from(element.attributes)
-  for(let attr of attrs) {
+  for(let attr of Array.from(element.attributes)) {
     let { name, value } = attr
     if(!name.startsWith('data-'))
       continue
