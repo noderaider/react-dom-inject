@@ -16,12 +16,37 @@ const ReactDOMInject = ReactElement => {
     let __html = element.innerHTML.length > 0 ? element.innerHTML : null
     return ReactDOM.render(__html ? <ReactElement {...props} dangerouslySetInnerHTML={{ __html }} /> : <ReactElement {...props} />, element)
   }
-  /** Renders the ReactElement onto the selected element and allows optional default props to be provided. */
-  const render = (selector, props = {}) => {
+  const _tryRender = (selector, props) => {
     let element = document.querySelector(selector)
+    return element || false
     if(element)
       return _render(element, props)
-    console.warn(`ReactDOMInject: No matching element found for query selector => '${selector}'`)
+  }
+  /** Renders the ReactElement onto the selected element and allows optional default props to be provided. */
+  const render = (selector, props = {}) => {
+    let rendered = _tryRender(selector, props)
+    let attempts = 0
+    let maxAttempts = 20
+    if(rendered)
+      return Promise.resolve(rendered)
+    else {
+      return new Promise((resolve, reject) => {
+        attempts++
+        let interval = setInterval(() => {
+          let rendered = _tryRender(selector, props)
+          if(rendered) {
+            clearInterval(interval)
+            console.warn(`ReactDOMInject: Rendered in ${attempts} attempts => '${selector}'`)
+            Promise.resolve(rendered)
+          } else if(attempts == maxAttempts) {
+            clearInterval(interval)
+            const message = `ReactDOMInject: Failed to find query selector in ${attempts} attempts => '${selector}'`
+            console.warn(message)
+            Promise.reject(new Error(message))
+          }
+        }, 100)
+      })
+    }
   }
   /** Renders the ReactElement onto all matching elements and allows optional default props to be provided. */
   const renderAll = (selector, props = {}) => {
