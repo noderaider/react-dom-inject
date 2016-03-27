@@ -1,14 +1,16 @@
 import React from 'react'
-import ReactDOMInject from './ReactDOMInject'
 import { connect as connectRedux } from 'react-redux'
+import ReactDOMInject from './ReactDOMInject'
 
 /**
  * Used just like react-redux connect.
  */
 export const connect = (mapStateToProps, mapDispatchToProps, mergeProps, options) => {
   return ReactElement => {
-    let ReactElementInject = ReactDOMInject(ReactElement)
-    connectRedux(mapStateToProps, mapDispatchToProps, mergeProps, options)(ReactElementInject)
+    return store => {
+      let InjectProvider = ReactDOMInjectProvider(ReactElement)(store)
+      return connectRedux(mapStateToProps, mapDispatchToProps, mergeProps, options)(InjectProvider)
+    }
   }
 }
 
