@@ -17,8 +17,10 @@ This package was written to ease transition of legacy applications from older sy
 ```html
 <!-- ... -->
 
-<!-- All data properties will be camelCased and injected into the components props object. -->
-<div id="my-element" data-title="My Element!" data-color="#ff0000" data-default-visibility="false"><span>Some inner HTML to be injected here</span></div>
+<!-- All data properties will be camelCased and injected into the components props object. Any innerHTML will be injected into the children element of your react component. -->
+<div id="my-element" data-title="My Element!" data-color="#ff0000" data-default-visibility="false">
+  <span>Some inner HTML to be injected here</span>
+</div>
 
 <!-- ... -->
 ```
